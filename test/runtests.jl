@@ -1,11 +1,8 @@
-"""
-Unit tests for sampling_beta
-"""
-model = LinearModel()
-display(model)
+using BayesianFactorModels
 using Test
+using Random
 
-@testset "sampling_beta_test" begin
+@testset "sampling β test" begin
     # Random sampled input with seed:
     Random.seed!(0)
     n = 10

@@ -1,0 +1,2 @@
+# ignore everything from the local test folder:
+test_local/*

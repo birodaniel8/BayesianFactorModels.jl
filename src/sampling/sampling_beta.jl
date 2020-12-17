@@ -7,7 +7,8 @@ function sampling_β(y::Vector,
                     stationarity_check::Bool=false, 
                     constant_included::Bool=false, 
                     max_iterations::Int=10000,
-                    β_prior=_β_prior, V_prior=_V_prior, σ²=_σ²
+                    β_prior::Union{Number, Vector}=_β_prior, V_prior::Union{Number, Array}=_V_prior, 
+                    σ²::Union{Number, Array}=_σ²
                     )::Vector
     
     k = size(x, 2)

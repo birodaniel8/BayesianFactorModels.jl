@@ -26,3 +26,22 @@ using Random
     @test sampled_β_5 ≈ [-0.20563735, 0.74841896]
     @test sampled_β_6 ≈ [-0.10634513, 0.74995998]
 end
+
+@testset "sampling σ² test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    t = 10
+    error = rand(t) .- 0.5
+    error_2 = rand(t, 3) .- 0.5
+
+    # Test cases:
+    sampled_σ²_1 = sampling_σ²(error)
+    sampled_σ²_2 = sampling_σ²(error, 5, 0.01)
+    sampled_σ²_3 = sampling_σ²(error_2)
+    sampled_σ²_4 = sampling_σ²(error_2, γ_prior=4, δ_prior=0.1)
+
+    @test sampled_σ²_1 ≈ [0.114303228]
+    @test sampled_σ²_2 ≈ [0.058208240]
+    @test sampled_σ²_3 ≈ [0.171990785, 0.179306053, 0.18531160]
+    @test sampled_σ²_4 ≈ [0.062340451, 0.061543355, 0.06129676]
+end

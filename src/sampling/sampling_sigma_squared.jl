@@ -1,7 +1,7 @@
 function sampling_σ²(ϵ::Array, 
                      _γ_prior::Number=1.5, 
                      _δ_prior::Number=0.5;
-                     γ_prior=_γ_prior, δ_prior=_δ_prior
+                     γ_prior::Number=_γ_prior, δ_prior::Number=_δ_prior
                      )::Vector
 
     t = size(ϵ, 1)

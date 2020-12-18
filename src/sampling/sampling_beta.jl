@@ -1,14 +1,14 @@
 function sampling_β(y::Vector, 
                     x::Array, 
                     _β_prior::Union{Number, Vector}=0, 
-                    _V_prior::Union{Number, Array}=1, 
-                    _σ²::Union{Number, Array}=0.01;
+                    _V_prior::Union{Number, AbstractArray}=1, 
+                    _σ²::Union{Number, AbstractArray}=0.01;
                     last_truncated::Bool=false, 
                     stationarity_check::Bool=false, 
                     constant_included::Bool=false, 
                     max_iterations::Int=10000,
-                    β_prior::Union{Number, Vector}=_β_prior, V_prior::Union{Number, Array}=_V_prior, 
-                    σ²::Union{Number, Array}=_σ²
+                    β_prior::Union{Number, Vector}=_β_prior, V_prior::Union{Number, AbstractArray}=_V_prior, 
+                    σ²::Union{Number, AbstractArray}=_σ²
                     )::Vector
     
     k = size(x, 2)
@@ -19,7 +19,7 @@ function sampling_β(y::Vector,
     V_prior = isa(V_prior, Vector) ? Diagonal(V_prior) : V_prior  # Vector to diag array
     σ² = isa(σ², Vector) ? Diagonal(σ²) : σ²  # Vector to array
 
-    # Calculate posteriror parameters
+    # Calculate posteriror parameters:
     V_posterior = inv(inv(V_prior) .+ (x' * inv(σ²) * x))
     V_posterior = Matrix(Hermitian(V_posterior))
     β_posterior = V_posterior * (inv(V_prior) * β_prior .+ x' * inv(σ²) * y)

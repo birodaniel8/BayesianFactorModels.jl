@@ -110,6 +110,7 @@ function _kalman_filter_tvp(z::Union{Number, AbstractArray},
         if all(isnan.(z[:, i]))
             # if all of them is missing at time 'i', there is not update and the updated values are the predicted ones
         elseif any(isnan.(z[:, i]))
+            keep = .~isnan.(z[:, i])
             K = P[:, :, i] * H[keep, :, i]' / (H[keep, :, i] * P[:, :, i] * H[keep, : , i]' + R[keep, keep, i])  # Calculate the Kalman gain matrix only with the observed data
             x[:, i] = x[:, i] + K * (z[keep, i] - H[keep, :, i] * x[:, i])  # Update the state vector only with the observed data
             P[:, :, i] = (I(k) - K * H[keep, :, i]) * P[:, :, i]  # Update the covariance only with the observed data

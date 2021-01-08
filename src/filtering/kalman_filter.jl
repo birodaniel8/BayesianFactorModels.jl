@@ -97,7 +97,6 @@ function _kalman_filter_tvp(z::Union{Number, AbstractArray},
     Q = size(Q, 3) == 1 ? Q = repeat(Q, 1, 1, T) : Q
 
     # Loop through and perform the Kalman filter equations recursively:
-    display(z)
     for i = 1:T
         # Prediction step:
         if i == 1

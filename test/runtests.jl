@@ -1,6 +1,7 @@
 using BayesianFactorModels
 using Test
 using Random
+using LinearAlgebra
 
 @testset "sampling β test" begin
     # Random sampled input with seed:
@@ -47,5 +48,61 @@ end
 end
 
 @testset "Kalman filter test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
     
+    y = randn(100, 1)
+    y[20, 1] = NaN  # adding some missing value too
+    # Tests with different input data types:
+    H = [1. 0. 0.] # m=1, k=3
+    R = [0.04]
+    G = [[1 1 0.5];
+        [0 1 1];
+        [0 0 1]]
+    Q = [[1 0 0];
+        [0 1e-4 0];
+        [0 0 1e-6]]
+    x, P = kalman_filter(y, H, R, G, Q)
+    @test true  # we only check whether the run was successfull
+
+    x0 = zeros(3)
+    P0 = Diagonal([10.; 1.; 1.])
+    x, P = kalman_filter(y, H, R, G, Q, x0=x0, P0=P0)
+    @test true
+
+    R = 0.04
+    x, P = kalman_filter(y, H, R, G, Q, x0=x0, P0=P0)
+    @test true
+
+    y = randn(100, 2)
+    y[2, 1] = NaN
+    H = [[1. 0. 0.];
+         [0. 1. 0.]]  # m=2, k=3
+    x, P = kalman_filter(y, H, R, G, Q, x0=x0, P0=P0)
+    @test true
+
+    H = [1, 0.5]  # m=2, k=1
+    R = 0.1
+    G = 0.2
+    Q = 0.1
+    x, P = kalman_filter(y, H, R, G, Q)
+    @test true
+
+    G = [-0.1]
+    x, P = kalman_filter(y, H, R, G, Q)
+    @test true
+
+    x, P = kalman_filter(y, H, R, G, Q, μ=0.3, x0=2, P0=0.1)
+    @test true
+
+    x, P = kalman_filter(y, H, R, G, Q, μ=0.3, x0=[2], P0=0.1)
+    @test true
+
+    G = randn(1, 1, 100)
+    x, P = kalman_filter(y, H, R, G, Q, μ=0.3, x0=[2], P0=0.1)
+    @test true
+
+    R = [0.2, 0.4]
+    x, P = kalman_filter(y, H, R, G, Q, μ=0.3, x0=[2], P0=0.1)
+    @test true
 end

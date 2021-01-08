@@ -62,15 +62,16 @@ end
 
 
 function _kalman_filter_tvp(z::Union{Number, AbstractArray}, 
-                       H::Union{Number, AbstractArray}, 
-                       R::Union{Number, AbstractArray}, 
-                       G::Union{Number, AbstractArray}, 
-                       Q::Union{Number, AbstractArray}, 
-                       _μ::Union{Number, Vector}=0, 
-                       _x0::Union{Number, Vector}=0,
-                       _P0::Union{Number, AbstractArray}=1;
-                       μ::Union{Number, Vector}=_μ, x0::Union{Number, Vector}=_x0, P0::Union{Number, AbstractArray}=_P0)
-    display(z)
+                            H::Union{Number, AbstractArray}, 
+                            R::Union{Number, AbstractArray}, 
+                            G::Union{Number, AbstractArray}, 
+                            Q::Union{Number, AbstractArray}, 
+                            _μ::Union{Number, Vector}=0, 
+                            _x0::Union{Number, Vector}=0,
+                            _P0::Union{Number, AbstractArray}=1;
+                            μ::Union{Number, Vector}=_μ, x0::Union{Number, Vector}=_x0, 
+                            P0::Union{Number, AbstractArray}=_P0)
+
     z = z'
     T = size(z, 2)
     H = isa(H, Number) ? H = [H] : H

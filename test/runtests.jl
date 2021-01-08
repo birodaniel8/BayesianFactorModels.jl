@@ -45,3 +45,7 @@ end
     @test sampled_σ²_3 ≈ [0.171990785, 0.179306053, 0.18531160]
     @test sampled_σ²_4 ≈ [0.062340451, 0.061543355, 0.06129676]
 end
+
+@testset "Kalman filter test" begin
+    
+end

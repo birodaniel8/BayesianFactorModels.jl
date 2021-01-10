@@ -114,9 +114,10 @@ function mcmc_sampling(model::LinearFactorModel, y::Array;
     sampled_factor = zeros(T, model.k, ndraw - burnin)
 
     # Initial values:
-    σ² = haskey(init_vals, "σ²") ? [init_vals["σ²"]] : ones(m) * (model.γ_prior - 1) / model.δ_prior
+    σ² = haskey(init_vals, "σ²") ? init_vals["σ²"] : ones(m) * (model.γ_prior - 1) / model.δ_prior
     σ² = isa(σ², Number) ? ones(m) * σ² : σ²
-    factor = haskey(init_vals, "factor") ? [init_vals["factor"]] : factor_initialize(y, model.k)
+    factor = haskey(init_vals, "factor") ? init_vals["factor"] : factor_initialize(y, model.k)
+    factor = isa(factor, Number) ? ones(T, model.k) * factor : factor
     
     # Sampling:
     display ? println("Estimate normal linear factor model (via Gibbs sampling)") : -1

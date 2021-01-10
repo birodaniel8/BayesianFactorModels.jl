@@ -144,7 +144,7 @@ end
 
     model = LinearModel()
     sampled_β, sampled_σ² = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
-    @test true  # we only check whether the run was successfull
+    @test true
 
     model = LinearModel([0], 5, 5, 1)
     sampled_β, sampled_σ² = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
@@ -193,7 +193,7 @@ end
 
     model = LinearModelT()
     sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
-    @test true  # we only check whether the run was successfull
+    @test true
 
     model = LinearModelT([0], 5, 5, 1, 5)
     sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
@@ -210,6 +210,42 @@ end
     model = LinearModelT(β_prior=[1], V_prior=[1], γ_prior=5, δ_prior=1)
     sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x, ndraw=1000, display=false, 
                                                      init_vals=Dict("σ²" => 0.1, "ν" => 5))
+    @test true
+end
+
+@testset "LinearFactorModel test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    y = randn(100, 3)
+
+    model = LinearFactorModel(2);
+    sampled_β, sampled_σ², sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true  # we only check whether the run was successfull
+
+    model = LinearFactorModel(k=2);
+    sampled_β, sampled_σ², sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = LinearFactorModel(k=2, β_prior = [0.5 0; 0.2 0.3; 0 0.3]);
+    sampled_β, sampled_σ², sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = LinearFactorModel(1);
+    sampled_β, sampled_σ², sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = LinearFactorModel(1, β_prior=[0.2, 0.3, 0.4], γ_prior=3, δ_prior=0.3);
+    sampled_β, sampled_σ², sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = LinearFactorModel(1, β_prior=[0.2, 0.3, 0.4], γ_prior=3, δ_prior=0.3);
+    sampled_β, sampled_σ², sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false, 
+                                                          init_vals=Dict("σ²" => 0.1, "factor" => randn(100)))
+    @test true
+
+    model = LinearFactorModel(1, β_prior=[0.2, 0.3, 0.4], γ_prior=3, δ_prior=0.3);
+    sampled_β, sampled_σ², sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false, 
+                                                          init_vals=Dict("σ²" => 0.1, "factor" => 0.1))
     @test true
 end
 

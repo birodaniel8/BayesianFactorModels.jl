@@ -41,17 +41,17 @@ end
 
 struct LinearFactorModel
     k::Int
-    β_prior::Union{Number, Vector}
+    β_prior::Union{Number, Array}
     V_prior::Union{Number, AbstractArray}
     γ_prior::Number
     δ_prior::Number
 
-    function LinearFactorModel(_k::Int,
-                               _β_prior::Union{Number, Vector}=0, 
+    function LinearFactorModel(_k::Int=1,
+                               _β_prior::Union{Number, Array}=0, 
                                _V_prior::Union{Number, AbstractArray}=1, 
                                _γ_prior::Number=1.5, 
                                _δ_prior::Number=0.5;
-                               k=_k::Int, β_prior::Union{Number, Vector}=_β_prior, 
+                               k=_k::Int, β_prior::Union{Number, Array}=_β_prior, 
                                V_prior::Union{Number, AbstractArray}=_V_prior, γ_prior::Number=_γ_prior, 
                                δ_prior::Number=_δ_prior)
         new(k, β_prior, V_prior, γ_prior, δ_prior)

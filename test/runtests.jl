@@ -358,3 +358,49 @@ end
     sampled_x = sampling_carter_kohn(x2, P2, G2, Q2);
     @test true
 end
+
+
+@testset "NormalFactorModelDGP test" begin
+    dgp = NormalFactorModelDGP(default_params=true)
+    y, f = dgp_generate(dgp)
+    @test true  # we only check whether the run was successfull
+
+    dgp = NormalFactorModelDGP(default_params=true)
+    y, f = dgp_generate(dgp, 200)
+    @test true
+
+    dgp = NormalFactorModelDGP()
+    y, f = dgp_generate(dgp)
+    @test true
+
+    dgp = NormalFactorModelDGP(5, 2)
+    y, f = dgp_generate(dgp)
+    @test true
+
+    dgp = NormalFactorModelDGP(β=[0.8 0.1; 1 0.9])
+    y, f = dgp_generate(dgp)
+    @test true
+end
+
+
+@testset "DynamicFactorModelDGP test" begin
+    dgp = DynamicFactorModelDGP(default_params=true)
+    y, f = dgp_generate(dgp)
+    @test true  # we only check whether the run was successfull
+
+    dgp = DynamicFactorModelDGP(default_params=true)
+    y, f = dgp_generate(dgp, 200)
+    @test true
+
+    dgp = DynamicFactorModelDGP()
+    y, f = dgp_generate(dgp)
+    @test true
+
+    dgp = DynamicFactorModelDGP(5, 2)
+    y, f = dgp_generate(dgp)
+    @test true
+
+    dgp = DynamicFactorModelDGP(β=[0.8 0.1; 1 0.9], θ=0.5)
+    y, f = dgp_generate(dgp)
+    @test true
+end

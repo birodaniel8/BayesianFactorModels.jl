@@ -9,7 +9,8 @@ export sampling_β, sampling_σ², sampling_factor, sampling_factor_loading, sam
        mcmc_sampling,
        kalman_filter,
        LinearModel, LinearFactorModel, LinearModelT,
-       dgp_normal
+       NormalFactorModelDGP, DynamicFactorModelDGP,
+       dgp_generate
 
 # Add sampling functions:
 include("sampling/sampling_beta.jl")
@@ -24,7 +25,8 @@ include("sampling/sampling_carter_kohn.jl")
 include("filtering/kalman_filter.jl")
 
 # Add data generating processes:
-include("dgp/dgp_factor_model.jl")
+include("dgp/dgp_models.jl")
+include("dgp/dgp_generate.jl")
 
 # Add models:
 include("models/models.jl")

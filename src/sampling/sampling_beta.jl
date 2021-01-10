@@ -1,3 +1,33 @@
+"""
+    sampling_β(y, x, β_prior = 0, V_prior = 1, σ² = 0.01; last_truncated = false, stationarity_check = false, constant_included = true, max_iterations = 10000)
+
+Sampling the \$\\beta\$ coefficients of the normal linear model with independent normal-gamma priors.
+
+It takes a sample from \$N(\\beta_{posterior},V_{posterior})\$, where
+
+\$V_{posterior} = (V_{prior}^{-1} + X'\\sigma^{-2}X)^{-1}\$
+
+\$\\beta_{posterior} = V_{posterior}(V_{prior}^{-1}\\beta_{prior} + X'\\sigma^{-2}y)\$
+
+## Arguments
+- `y::Vector`: (T x 1) dependent variable
+- `x::Array`: (T x k) explanatory variables
+- `β_prior::Union{Number, Vector}`: (k) mean of the prior distribution (\$\\beta_{prior}\$)
+- `V_prior::Union{Number, AbstractArray}`: (k x k) covariance of the prior distribution (\$V_{prior}\$)
+- `σ²::Union{Number, AbstractArray}`: error (co)variance (\$\\sigma^2\$)
+- `last_truncated::Bool`: if true, the sample is taken from a multivariate normal distribution but the last element is truncated at 0
+- `stationarity_check::Bool`: if true, the sampling is repeated until the sampled coefficients stand for a stationary AR(k) model (without intercept)
+- `constant_included::Bool`: if true, the stationarity check is based on an AR(k-1) model (with intercept as a 1st variable)
+- `max_iterations::Int`: maximum number of samples taken to sample coefficients for a stationary AR(k) model (without intercept)
+
+## Returns
+- `sampled_β::Vector`: (k) sampled \$\\beta\$ coefficients
+
+## Note
+- If `β_prior` is given as a number, a (k) length vector is created and filled by its value
+- If `V_prior` is given as a number or a vector, a (k x k) diagonal matrix is created having the input values in the diagonal
+- The implementation allows the error variance to be dependent on the observation and then \$\\sigma^{2}\$ is replaced by \$\\Sigma\$, which is an (N x N) diagonal matrix with \$\\sigma_{i}^{2}\$ in the diagonal elements.
+"""
 function sampling_β(y::Vector, 
                     x::Array, 
                     _β_prior::Union{Number, Vector}=0, 

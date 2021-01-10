@@ -1,5 +1,7 @@
+cd(pwd() * "\\docs")
 using Documenter
 using BayesianFactorModels
+
 
 makedocs(
     sitename = "BayesianFactorModels",

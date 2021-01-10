@@ -1,9 +1,35 @@
+"""
+    sampling_df(λ, ν_previous, ν_prior = 30, hm_variance = 0.25)
+
+Sampling the degree of freedom parameter of the normal linear model with independent normal-gamma priors and known
+    heteroscedasticity (ie t-errors).
+
+It iterates trough the columns of the matrix `λ` and takes a sample from the distribution given as:
+
+\$p(v|...) \\propto \\Big(\\frac{v}{2}\\Big)^{0.5Tv}\\Gamma\\Big(\\frac{v}{2}\\Big)^{-T}e^{-\\eta v}\$
+where \$\\eta = \\frac{1}{v_{prior}} + 0.5\\sum_{i=1}^T[ln(\\lambda^{-1}) + \\lambda]\$ via random walk Metropolis-Hastings algorithm.
+
+
+## Arguments
+- `λ::Array`: (T x m) mixture scale parameters (\$\\lambda\$)
+- `ν_previous::Union{Number, Vector}`: (m) vector of the previous degree of freedom parameters
+- `ν_prior::Union{Number, Vector}`: (m) vector of prior degree of freedom parameters (\$v_{prior}\$)
+- `hm_variance::Union{Number, Vector}`: Random walk Metropolis-Hastings algorithm variance parameters
+
+## Returns
+- `ν_sampled::Vector`: (m) sampled degree of freedoms
+
+## Note
+- If `ν_previous` is given as a number, an (m) length vector is created and filled by its value
+- If `ν_prior` is given as a number, an (m) length vector is created and filled by its value
+- If `hm_variance` is given as a number, an (m) length vector is created and filled by its value
+"""
 function sampling_df(λ::Array, 
                      _ν_previous::Union{Number, Vector}=30, 
                      _ν_prior::Union{Number, Vector}=30, 
-                     _hm_variance::Number=0.25;
+                     _hm_variance::Union{Number, Vector}=0.25;
                      ν_previous::Union{Number, Vector}=_ν_previous, ν_prior::Union{Number, Vector}=_ν_prior, 
-                     hm_variance::Number=_hm_variance
+                     hm_variance::Union{Number, Vector}=_hm_variance
                      )::Vector
                      
     N = size(λ, 1)

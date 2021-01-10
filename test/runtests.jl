@@ -47,6 +47,23 @@ end
     @test sampled_σ²_4 ≈ [0.062340451, 0.061543355, 0.06129676]
 end
 
+@testset "sampling mixtrue scale test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    ϵ = randn(5)
+    ϵ2 = randn(5, 2)
+
+    sampled_ν_1 = sampling_mixture_scale(ϵ, [0.1], [5])
+    sampled_ν_2 = sampling_mixture_scale(ϵ, σ²=[0.1], ν=[3])
+    @test sampled_ν_1 ≈ [0.46030952, 0.01957489, 0.91558343, 0.89474495, 1.09754507]
+    @test sampled_ν_2 ≈ [0.36612055, 0.33247866, 0.51515191, 1.18814004, 0.22087024]
+    
+    sampled_ν_3 = sampling_mixture_scale(ϵ2, [0.1, 0.3], [5, 6])
+    sampled_ν_4 = sampling_mixture_scale(ϵ2, σ²=[0.1, 0.4], ν=[3, 4])
+    @test sampled_ν_3 ≈ [[1.08340060, 1.39515432, 0.80232465, 0.88058962, 0.16187903] [1.68493236, 1.48817376, 1.19266668, 0.60232980, 0.84324196]]
+    @test sampled_ν_4 ≈ [[0.65987117, 0.85963046, 1.30833576, 0.81158283, 0.20084423] [2.22305275, 1.21759091, 1.01091807, 0.55266799, 0.66175961]]
+end
+
 @testset "Kalman filter test" begin
     # Random sampled input with seed:
     Random.seed!(0)

@@ -1,6 +1,6 @@
-function sampling_mixtrue_scale(ϵ::Array, 
-                                _σ²::Vector, 
-                                _ν::Vector;
+function sampling_mixture_scale(ϵ::Array, 
+                                _σ²::Vector=[0.01], 
+                                _ν::Vector=[30];
                                 σ²::Vector=_σ², ν::Vector=_ν
                                 )::Array
     N = size(ϵ, 1)

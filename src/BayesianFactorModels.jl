@@ -4,7 +4,7 @@ using LinearAlgebra, MAT, LinearAlgebra, Distributions, Polynomials, SpecialFunc
 
 greet() = print("BayesianFactorModels Julia package")
 
-export sampling_β, sampling_σ², sampling_factor, sampling_factor_loading, sampling_df, sampling_mixtrue_scale,
+export sampling_β, sampling_σ², sampling_factor, sampling_factor_loading, sampling_df, sampling_mixture_scale,
        mcmc_sampling,
        kalman_filter,
        LinearModel, LinearFactorModel, LinearModelT,

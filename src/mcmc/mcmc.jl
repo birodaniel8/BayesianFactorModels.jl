@@ -126,7 +126,7 @@ function mcmc_sampling(model::LinearModelT, y::Vector, x::Array;
         β = sampling_β(y_star, x_star, model.β_prior, model.V_prior, σ²)  # sampling beta coefficients
         σ² = sampling_σ²(y_star - x_star * β[:,:], model.γ_prior, model.δ_prior)  # sampling error variance
         ν = sampling_df(λ, ν, model.ν_prior, hm_variance)  # sampling degree of freedom
-        λ = sampling_mixtrue_scale(y - x * β[:,:], σ², ν)  # sampling λ
+        λ = sampling_mixture_scale(y - x * β[:,:], σ², ν)  # sampling λ
 
         # Save samples:
         if i > burnin

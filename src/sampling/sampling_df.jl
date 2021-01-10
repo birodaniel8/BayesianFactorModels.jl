@@ -1,5 +1,5 @@
 function sampling_df(λ::Array, 
-                     _ν_previous::Union{Number, Vector}, 
+                     _ν_previous::Union{Number, Vector}=30, 
                      _ν_prior::Union{Number, Vector}=30, 
                      _hm_variance::Number=0.25;
                      ν_previous::Union{Number, Vector}=_ν_previous, ν_prior::Union{Number, Vector}=_ν_prior, 

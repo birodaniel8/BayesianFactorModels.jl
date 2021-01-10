@@ -94,6 +94,25 @@ end
     @test sampled_λ_10 ≈ [4.89819263, 4.94346203]
 end
 
+@testset "sampling factor loading test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    y = randn(100, 3)
+    f = randn(100, 2)
+    f2 = randn(100, 1)
+
+    sampled_loading_1 = sampling_factor_loading(y, f, 0, 1, [0.2, 0.3, 0.4])
+    sampled_loading_2 = sampling_factor_loading(y, f, [[0.5, 0.6, 0.4] [0.5, 0.6, 0.4]], 
+                                                [[0.1, 0.1, 0.2] [0.1, 0.1, 0.2]], [0.2, 0.3, 0.4])
+    sampled_loading_3 = sampling_factor_loading(y, f2, 0, 1, [0.2, 0.3, 0.4])
+    sampled_loading_4 = sampling_factor_loading(y, f2, [0.5, 0.6, 0.4], [0.1, 0.1, 0.2], [0.2, 0.3, 0.4])
+    
+    @test sampled_loading_1 ≈ [0.0214861477 0.0; 0.00745356477 0.00019266567; 0.1538865454 0.033081841]
+    @test sampled_loading_2 ≈ [0.0293607108 0.0; 0.00777292639 0.00219933746; 0.0361523677 0.044494756]
+    @test sampled_loading_3 ≈ [0.06257023, 0.21357754, -0.24474075]
+    @test sampled_loading_4 ≈ [0.0721294182; 0.2115473233; -0.277806024]
+end
+
 @testset "Kalman filter test" begin
     # Random sampled input with seed:
     Random.seed!(0)

@@ -256,7 +256,7 @@ end
     y = randn(100, 1)
     y[20, 1] = NaN  # adding some missing value too
     # Tests with different input data types:
-    H = [1. 0. 0.] # m=1, k=3
+    H = [1. 0. 0.]  # m=1, k=3
     R = [0.04]
     G = [[1 1 0.5];
         [0 1 1];
@@ -306,5 +306,55 @@ end
 
     R = [0.2, 0.4]
     x, P = kalman_filter(y, H, R, G, Q, μ=0.3, x0=[2], P0=0.1)
+    @test true
+end
+
+@testset "Carter & Kohn sampling test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+
+    y = randn(100, 1)
+    H = [1. 0. 0.]  # k=3
+    R = [0.04]
+    G = [[1 1 0.5];
+        [0 1 1];
+        [0 0 1]]
+    Q = [[1 0 0];
+        [0 1e-4 0];
+        [0 0 1e-6]]
+    x, P = kalman_filter(y, H, R, G, Q)
+
+    y2 = randn(100, 2)
+    H2 = [1, 0.5]  # k=1
+    R2 = 0.1
+    G2 = 0.2
+    Q2 = 0.1
+    x2, P2 = kalman_filter(y2, H2, R2, G2, Q2)
+
+    sampled_x = sampling_carter_kohn(x, P, G, Q);
+    @test true  # we only check whether the run was successfull
+
+    sampled_x = sampling_carter_kohn(x, P, 1, 0.001);
+    @test true
+
+    sampled_x = sampling_carter_kohn(x, P, G, Q, j=2);
+    @test true
+
+    sampled_x = sampling_carter_kohn(x, P, G, Q, j=2, μ=0.01);
+    @test true
+
+    G = Diagonal([0.1, 0.1, 0.1])
+    sampled_x = sampling_carter_kohn(x, P, G, Q, j=2, μ=0.01);
+    @test true
+
+    G = repeat(G, 1, 1, 100);
+    sampled_x = sampling_carter_kohn(x, P, G, Q, j=2, μ=0.01);
+    @test true
+
+    sampled_x = sampling_carter_kohn(x2, P2, G2, Q2);
+    @test true
+
+    Q2 = repeat([Q2], 1, 1, 100);
+    sampled_x = sampling_carter_kohn(x2, P2, G2, Q2);
     @test true
 end

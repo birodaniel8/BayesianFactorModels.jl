@@ -6,27 +6,28 @@ function kalman_filter(z::Union{Number, AbstractArray},
                        _μ::Union{Number, Vector}=0, 
                        _x0::Union{Number, Vector}=0,
                        _P0::Union{Number, AbstractArray}=1;
-                       μ::Union{Number, Vector}=_μ, x0::Union{Number, Vector}=_x0, P0::Union{Number, AbstractArray}=_P0)
+                       μ::Union{Number, Vector}=_μ, x0::Union{Number, Vector}=_x0, P0::Union{Number, AbstractArray}=_P0
+                       )::Tuple{Array, Array}
 
     if size(H, 3) > 1 || size(R, 3) > 1 || size(G, 3) > 1 || size(Q, 3) > 1
         x, P = _kalman_filter_tvp(z, H, R, G, Q, μ, x0, P0)
     else
         z = z'
         T = size(z, 2)
-        H = isa(H, Number) ? H = [H] : H
+        H = isa(H, Number) ? [H] : H
         m = size(H, 1)
         k = size(H, 2)
         x = zeros(k, T)
         P = zeros(k, k, T)
         
         # Convert everything to 2d arrays:
-        R = isa(R, Number) ? R = I(m)*R : R
-        G = isa(G, Number) ? G = I(k)*G : G
-        Q = isa(Q, Number) ? Q = I(k)*Q : Q
-        H = isa(H, Vector) ? H = reshape(H, (m, k)) : H
-        R = isa(R, Vector) ? R = Diagonal(R) : R
-        G = isa(G, Vector) ? G = Diagonal(G) : G
-        Q = isa(Q, Vector) ? Q = Diagonal(Q) : Q
+        R = isa(R, Number) ? I(m)*R : R
+        G = isa(G, Number) ? I(k)*G : G
+        Q = isa(Q, Number) ? I(k)*Q : Q
+        H = isa(H, Vector) ? reshape(H, (m, k)) : H
+        R = isa(R, Vector) ? Diagonal(R) : R
+        G = isa(G, Vector) ? Diagonal(G) : G
+        Q = isa(Q, Vector) ? Diagonal(Q) : Q
         x0 = isa(x0, Number) ? ones(k) * x0 : x0  # Number to vector, except this
         P0 = isa(P0, Number) ? I(k) * P0 : P0  # Number to matrix
         P0 = isa(P0, Vector) ? Diagonal(P0) : P0  # Vector to diag array
@@ -55,7 +56,7 @@ function kalman_filter(z::Union{Number, AbstractArray},
                 P[:, :, i] = (I(k) - K * H) * P[:, :, i]  # Update the covariance
             end
         end
-        x = x'
+        x = Array(x')
     end
     return x, P
 end
@@ -70,11 +71,12 @@ function _kalman_filter_tvp(z::Union{Number, AbstractArray},
                             _x0::Union{Number, Vector}=0,
                             _P0::Union{Number, AbstractArray}=1;
                             μ::Union{Number, Vector}=_μ, x0::Union{Number, Vector}=_x0, 
-                            P0::Union{Number, AbstractArray}=_P0)
+                            P0::Union{Number, AbstractArray}=_P0
+                            )::Tuple{Array, Array}
 
     z = z'
     T = size(z, 2)
-    H = isa(H, Number) ? H = [H] : H
+    H = isa(H, Number) ? [H] : H
     m = size(H, 1)
     k = size(H, 2)
     x = zeros(k, T)
@@ -84,17 +86,17 @@ function _kalman_filter_tvp(z::Union{Number, AbstractArray},
     P0 = isa(P0, Vector) ? Diagonal(P0) : P0  # Vector to diag array
 
     # Convert everything to 3d arrays:
-    R = isa(R, Number) ? R = I(m)*R : R
-    G = isa(G, Number) ? G = I(k)*G : G
-    Q = isa(Q, Number) ? Q = I(k)*Q : Q
-    H = isa(H, Vector) ? H = reshape(H, (m, k)) : H
-    R = isa(R, Vector) ? R = Diagonal(R) : R
-    G = isa(G, Vector) ? G = Diagonal(G) : G
-    Q = isa(Q, Vector) ? Q = Diagonal(Q) : Q
-    H = size(H, 3) == 1 ? H = repeat(H, 1, 1, T) : H
-    R = size(R, 3) == 1 ? R = repeat(R, 1, 1, T) : R
-    G = size(G, 3) == 1 ? G = repeat(G, 1, 1, T) : G
-    Q = size(Q, 3) == 1 ? Q = repeat(Q, 1, 1, T) : Q
+    R = isa(R, Number) ? I(m)*R : R
+    G = isa(G, Number) ? I(k)*G : G
+    Q = isa(Q, Number) ? I(k)*Q : Q
+    H = isa(H, Vector) ? reshape(H, (m, k)) : H
+    R = isa(R, Vector) ? Diagonal(R) : R
+    G = isa(G, Vector) ? Diagonal(G) : G
+    Q = isa(Q, Vector) ? Diagonal(Q) : Q
+    H = size(H, 3) == 1 ? repeat(H, 1, 1, T) : H
+    R = size(R, 3) == 1 ? repeat(R, 1, 1, T) : R
+    G = size(G, 3) == 1 ? repeat(G, 1, 1, T) : G
+    Q = size(Q, 3) == 1 ? repeat(Q, 1, 1, T) : Q
 
     # Loop through and perform the Kalman filter equations recursively:
     for i = 1:T
@@ -120,6 +122,6 @@ function _kalman_filter_tvp(z::Union{Number, AbstractArray},
             P[:, :, i] = (I(k) - K * H[:, :, i]) * P[:, :, i]  # Update the covariance
         end
     end
-    x = x'
+    x = Array(x')
     return x, P
 end

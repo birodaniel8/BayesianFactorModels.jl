@@ -3,6 +3,8 @@ using Test
 using Random
 using LinearAlgebra
 
+# to run the tests, type "]" to the Julia REPL to open the package manager mode and run "test BayesianFactorModels" 
+
 @testset "sampling β test" begin
     # Random sampled input with seed:
     Random.seed!(0)
@@ -111,6 +113,104 @@ end
     @test sampled_loading_2 ≈ [0.0293607108 0.0; 0.00777292639 0.00219933746; 0.0361523677 0.044494756]
     @test sampled_loading_3 ≈ [0.06257023, 0.21357754, -0.24474075]
     @test sampled_loading_4 ≈ [0.0721294182; 0.2115473233; -0.277806024]
+end
+
+@testset "LinearModel test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    y = randn(100)
+    x = randn(100, 3)
+    x2 = randn(100)
+
+    model = LinearModel()
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x, ndraw=1000, display=false)
+    @test true  # we only check whether the run was successfull
+
+    model = LinearModel([0, 1, 2], 5, 5, 1)
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModel([0, 1, 2, 3], 5, 5, 1, add_constant=true)
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModel(β_prior=[0, 1, 2, 3], V_prior=[0.1, 0.2, 0.3, 1], γ_prior=5, δ_prior=1, add_constant=true)
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModel(β_prior=[0, 1, 2, 3], V_prior=[0.1, 0.2, 0.3, 1], γ_prior=5, δ_prior=1, add_constant=true)
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x, ndraw=1000, display=false, init_vals=Dict("σ²" => 0.1))
+    @test true
+
+    model = LinearModel()
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
+    @test true  # we only check whether the run was successfull
+
+    model = LinearModel([0], 5, 5, 1)
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModel([0, 1], 5, 5, 1, add_constant=true)
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModel(β_prior=[1], V_prior=[1], γ_prior=5, δ_prior=1)
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
+    @test true
+    
+    model = LinearModel(β_prior=[1], V_prior=[1], γ_prior=5, δ_prior=1)
+    sampled_β, sampled_σ² = mcmc_sampling(model, y, x2, ndraw=1000, display=false, init_vals=Dict("σ²" => 0.1))
+    @test true
+end
+
+@testset "LinearModelT test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    y = randn(100)
+    x = randn(100, 3)
+    x2 = randn(100)
+
+    model = LinearModelT()
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x, ndraw=1000, display=false)
+    @test true  # we only check whether the run was successfull
+
+    model = LinearModelT([0, 1, 2], 5, 5, 1, 5)
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModelT([0, 1, 2, 3], 5, 5, 1, add_constant=true)
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModelT(β_prior=[0, 1, 2, 3], V_prior=[0.1, 0.2, 0.3, 1], γ_prior=5, δ_prior=1, add_constant=true)
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModelT(β_prior=[0, 1, 2, 3], V_prior=[0.1, 0.2, 0.3, 1], γ_prior=5, δ_prior=1, add_constant=true)
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x, ndraw=1000, display=false, 
+                                                     init_vals=Dict("σ²" => 0.1, "ν" => 5))
+    @test true
+
+    model = LinearModelT()
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
+    @test true  # we only check whether the run was successfull
+
+    model = LinearModelT([0], 5, 5, 1, 5)
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModelT([0, 1], 5, 5, 1, add_constant=true)
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModelT(β_prior=[1], V_prior=[1], γ_prior=5, δ_prior=1)
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x2, ndraw=1000, display=false)
+    @test true
+
+    model = LinearModelT(β_prior=[1], V_prior=[1], γ_prior=5, δ_prior=1)
+    sampled_β, sampled_σ², sampled_ν = mcmc_sampling(model, y, x, ndraw=1000, display=false, 
+                                                     init_vals=Dict("σ²" => 0.1, "ν" => 5))
+    @test true
 end
 
 @testset "Kalman filter test" begin

@@ -24,7 +24,7 @@ It takes a sample from \$N(\\beta_{posterior},V_{posterior})\$, where
 - `sampled_β::Vector`: (k) sampled \$\\beta\$ coefficients
 
 ## Note
-- If `β_prior` is given as a number, a (k) length vector is created and filled by its value
+- If `β_prior` is given as a number, a (k) length vector is created and filled by the given value
 - If `V_prior` is given as a number or a vector, a (k x k) diagonal matrix is created having the input values in the diagonal
 - The implementation allows the error variance to be dependent on the observation and then \$\\sigma^{2}\$ is replaced by \$\\Sigma\$, which is an (N x N) diagonal matrix with \$\\sigma_{i}^{2}\$ in the diagonal elements.
 """

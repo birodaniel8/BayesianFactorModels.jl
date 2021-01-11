@@ -20,9 +20,9 @@ where \$\\eta = \\frac{1}{v_{prior}} + 0.5\\sum_{i=1}^T[ln(\\lambda^{-1}) + \\la
 - `ν_sampled::Vector`: (m) sampled degree of freedoms
 
 ## Note
-- If `ν_previous` is given as a number, an (m) length vector is created and filled by its value
-- If `ν_prior` is given as a number, an (m) length vector is created and filled by its value
-- If `hm_variance` is given as a number, an (m) length vector is created and filled by its value
+- If `ν_previous` is given as a number, an (m) length vector is created and filled by the given value
+- If `ν_prior` is given as a number, an (m) length vector is created and filled by the given value
+- If `hm_variance` is given as a number, an (m) length vector is created and filled by the given value
 """
 function sampling_df(λ::Array, 
                      _ν_previous::Union{Number, Vector}=30, 

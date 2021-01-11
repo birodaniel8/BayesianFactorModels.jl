@@ -19,3 +19,18 @@ BayesianFactorModels.sampling_df
 ```@docs
 BayesianFactorModels.sampling_mixture_scale
 ```
+
+## Sampling Carter & Kohn
+```@docs
+BayesianFactorModels.sampling_carter_kohn
+```
+
+## Sampling factor loadings
+```@docs
+BayesianFactorModels.sampling_factor_loading
+```
+
+## Sampling factor
+```@docs
+BayesianFactorModels.sampling_factor
+```

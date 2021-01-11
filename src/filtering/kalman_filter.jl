@@ -1,3 +1,42 @@
+"""
+    kalman_filter(z, H, R, G, Q, μ=0, x0=0, P0=1)
+
+This function performs the Kalman Filter estimation.
+
+\$z_t = H_t x_t + \\epsilon_t \\quad \\quad \\epsilon_t \\sim N(0,R_t)\$
+\$x_t = \\mu + G_t x_{t-1} + \\eta_t \\quad \\quad \\eta_t \\sim N(0,Q_t)\$
+
+## Arguments
+- `z::Union{Number, AbstractArray}`: (T x m) matrix of observations
+- `H::Union{Number, AbstractArray}`: (m x k x (T)) observation model matrix
+- `R::Union{Number, AbstractArray}`: (m x m x (T)) masurement noise covariance
+- `G::Union{Number, AbstractArray}`: (k x k x (T)) state transition matrix
+- `Q::Union{Number, AbstractArray}`: (k x k x (T)) process noise matrix
+- `μ::Union{Number, Vector}=0`: (k x 1) vector of constant terms
+- `x0::Union{Number, Vector}=0`: (k x 1) initial state values
+- `P0::Union{Number, AbstractArray}=1`: (k x k) initial state covariance matrix
+
+
+## Returns
+- `x::Matrix`: (T x k) estimated states
+- `P::Matrix`: (k x k x T) estimated state covariance matrixes
+
+## Notes: 
+- If any of the input matrixes (`H`, `R`, `G`, `Q`) is more then 2 dimensional, then the estimation is using a time-varying parameter Kalman Filter.
+- The implementation can also handle missing values in the observation matrix (it only updates via the non-missing values).
+
+The Kalman filter updates the state and the state covariance by a prediction-filtering procedure. The prediction propagates
+\$x\$ and \$P\$ based on information available at \$t-1\$:
+
+\$\\hat{x}_{t|t-1} = \\mu_t + G_t\\hat{x}_{t-1|t-1}\$
+\$P_{t|t-1} = G_t P_{t-1|t-1} G_t' + Q_t\$
+
+The updating step updates the estimates of \$x\$ and \$P\$ with information available at \$t\$:
+
+\$K_t = P_t H_t'(H_t P_{t|t-1} H_t' + R_t)^{-1}\$
+\$\\hat{x}_{t|t} = \\hat{x}_{t|t-1} + K_t(z_t-H_t\\hat{x}_{t|t-1})\$
+\$P_{t|t} = (I - K_t H_t)P_{t|t-1}\$
+"""
 function kalman_filter(z::Union{Number, AbstractArray}, 
                        H::Union{Number, AbstractArray}, 
                        R::Union{Number, AbstractArray}, 

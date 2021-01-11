@@ -1,3 +1,31 @@
+"""
+    sampling_carter_kohn(x, P, G, Q, μ=0, j=Nothing)
+
+Carter & Kohn (1994) sampling algorithm for sampling Kalman Filtered states.
+
+The Carter & Kohn procedure is a backward sampling algorithm where we recursively take \$x_t^*\$ samples from
+\$N(\\bar{x}_{t|t}, \\bar{P}_{t|t})\$, where \$\\bar{x}_{T|T} = x_{T|T}\$ and \$\\bar{P}_{T|T} = P_{T|T}\$ if \$t = T\$ and else
+
+\$\\bar{x}_{t|t} = x_{t|t} + P_{t|t}\\hat{G}_t'[\\hat{G}_t P_{t|t} \\hat{G}_t' + \\hat{Q}_t]^{-1}[x_{t+1}^* - \\mu - \\hat{G}_t' x_{t|t}]\$
+\$\\bar{P}_{t|t} = P_{t|t} - P_{t|t}\\hat{G}_t'[\\hat{G}_t P_{t|t} \\hat{G}_t' + \\hat{Q}_t]^{-1} \\hat{G}_t' P_{t|t}]\$
+
+where
+\$\\hat{G}_t' = G_{1:j,:}\$, \$\\hat{Q}_t' = Q_{1:j,1:j}\$ and \$j\$ is the largest integer for which Q is positive definite.
+
+## Arguments
+- `x::Array`: (T x k) state estimations from Kalman Filter (updated values)
+- `P::AbstractArray`: (k x k x T) state covariance from Kalman Filter (updated values)
+- `G::Union{Number, AbstractArray}`: (k x k x (T)) state transition matrix
+- `Q::Union{Number, AbstractArray}`: (k x k x (T)) process noise matrix
+- `μ::Union{Number, Vector}`: (k x 1) vector of constant terms
+- `j::Union{Int, DataType}`: size of the block for which the Q matrix is positive definite default: size(Q,1) ie. whole matrix
+
+## Returns
+- `sampled_x::Array`: (T x k) sampled states
+
+## Note
+The function can also sample with time-varying `G`, `Q` parameters.
+"""
 function sampling_carter_kohn(x::Array,
                               P::AbstractArray,
                               G::Union{Number, AbstractArray},

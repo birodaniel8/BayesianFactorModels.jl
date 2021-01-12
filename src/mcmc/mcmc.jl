@@ -139,3 +139,53 @@ function mcmc_sampling(model::LinearFactorModel, y::Array;
     display ? println("Done") : -1
     return [sampled_β, sampled_σ², sampled_factor]
 end
+
+
+function mcmc_sampling(model::DynamicLinearFactorModel, y::Array;
+                       ndraw::Int=1500, 
+                       burnin::Int=500, 
+                       init_vals::Dict=Dict(), 
+                       display::Bool=true,
+                       display_step::Int=250
+                       )
+    
+    T = size(y, 1)
+    m = size(y, 2)
+
+    # Create containers:
+    sampled_β = zeros(m, model.k, ndraw - burnin)
+    sampled_σ² = zeros(m, ndraw - burnin)
+    sampled_θ = zeros(model.k, ndraw - burnin)
+    sampled_factor = zeros(T, model.k, ndraw - burnin)
+
+    # Initial values:
+    σ² = haskey(init_vals, "σ²") ? init_vals["σ²"] : ones(m) * (model.γ_prior - 1) / model.δ_prior
+    σ² = isa(σ², Number) ? ones(m) * σ² : σ²
+    factor = haskey(init_vals, "factor") ? init_vals["factor"] : factor_initialize(y, model.k)
+    factor = isa(factor, Number) ? ones(T, model.k) * factor : factor
+    θ = zeros(model.k)
+    
+    # Sampling:
+    display ? println("Estimate dynamic linear factor model (via Gibbs sampling)") : -1
+    for i = 1:ndraw
+        (mod(i, display_step) == 0 && display) ? println(i) : -1
+
+        # Sampling:
+        β = sampling_factor_loading(y, factor, model.β_prior, model.V_prior, σ²)  # sampling factor loadings
+        σ² = sampling_σ²(y - factor * β', model.γ_prior, model.δ_prior)  # sampling error variances
+        for j = 1:model.k
+            θ[j] = sampling_β(factor[2:T, j],factor[1:T-1, j], model.θ_prior, model.θ_var_prior, 1, stationarity_check=true)[1]  # sampling factor AR(1) coefficients
+        end
+        factor = sampling_factor_dynamic(y, β, θ, σ²)  # sampling factors
+
+        # Save samples:
+        if i > burnin
+        sampled_β[:, :, i-burnin] = β
+        sampled_σ²[:, i-burnin] = σ²
+        sampled_θ[:, i-burnin] = θ
+        sampled_factor[:, :, i-burnin] = factor
+        end
+    end
+    display ? println("Done") : -1
+    return [sampled_β, sampled_σ², sampled_θ, sampled_factor]
+end

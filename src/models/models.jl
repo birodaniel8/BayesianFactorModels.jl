@@ -57,3 +57,28 @@ struct LinearFactorModel
         new(k, β_prior, V_prior, γ_prior, δ_prior)
     end
 end
+
+
+struct DynamicLinearFactorModel
+    k::Int
+    β_prior::Union{Number, Array}
+    V_prior::Union{Number, AbstractArray}
+    γ_prior::Number
+    δ_prior::Number
+    θ_prior::Number
+    θ_var_prior::Number
+
+    function DynamicLinearFactorModel(_k::Int=1,
+                                      _β_prior::Union{Number, Array}=0, 
+                                      _V_prior::Union{Number, AbstractArray}=1, 
+                                      _γ_prior::Number=1.5, 
+                                      _δ_prior::Number=0.5,
+                                      _θ_prior::Number=0,
+                                      _θ_var_prior::Number=1;
+                                      k=_k::Int, β_prior::Union{Number, Array}=_β_prior, 
+                                      V_prior::Union{Number, AbstractArray}=_V_prior, γ_prior::Number=_γ_prior, 
+                                      δ_prior::Number=_δ_prior, θ_prior::Number=_θ_prior, 
+                                      θ_var_prior::Number=_θ_var_prior)
+        new(k, β_prior, V_prior, γ_prior, δ_prior, θ_prior, θ_var_prior)
+    end
+end

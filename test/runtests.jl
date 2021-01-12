@@ -404,3 +404,42 @@ end
     y, f = dgp_generate(dgp)
     @test true
 end
+
+
+@testset "DynamicLinearFactorModel test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    y = randn(100, 3)
+
+    model = DynamicLinearFactorModel(2);
+    sampled_β, sampled_σ², sampled_θ, sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true  # we only check whether the run was successfull
+
+    model = DynamicLinearFactorModel(k=2);
+    sampled_β, sampled_σ², sampled_θ, sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = DynamicLinearFactorModel(k=2, β_prior = [0.5 0; 0.2 0.3; 0 0.3], θ_prior=0.2);
+    sampled_β, sampled_σ², sampled_θ, sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = DynamicLinearFactorModel(1);
+    sampled_β, sampled_σ², sampled_θ, sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = DynamicLinearFactorModel(1, β_prior=[0.2, 0.3, 0.4], γ_prior=3, δ_prior=0.3, θ_var_prior=0.02);
+    sampled_β, sampled_σ², sampled_θ, sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = DynamicLinearFactorModel(1, β_prior=[0.2, 0.3, 0.4], γ_prior=3, δ_prior=0.3, θ_var_prior=0.02);
+    sampled_β, sampled_σ², sampled_θ, sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false, 
+                                                                     init_vals=Dict("σ²" => 0.1, 
+                                                                                    "factor" => randn(100)))
+    @test true
+
+    model = DynamicLinearFactorModel(1, β_prior=[0.2, 0.3, 0.4], γ_prior=3, δ_prior=0.3, θ_var_prior=0.02);
+    sampled_β, sampled_σ², sampled_θ, sampled_factor = mcmc_sampling(model, y, ndraw=1000, display=false, 
+                                                                     init_vals=Dict("σ²" => 0.1, 
+                                                                                    "factor" => 0.1))
+    @test true
+end

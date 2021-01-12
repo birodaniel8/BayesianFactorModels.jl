@@ -5,10 +5,10 @@ using LinearAlgebra, MAT, LinearAlgebra, Distributions, Polynomials, SpecialFunc
 greet() = print("BayesianFactorModels Julia package")
 
 export sampling_β, sampling_σ², sampling_factor, sampling_factor_loading, sampling_df, sampling_mixture_scale,
-       sampling_carter_kohn,
+       sampling_carter_kohn, sampling_factor_dynamic,
        mcmc_sampling,
        kalman_filter,
-       LinearModel, LinearFactorModel, LinearModelT,
+       LinearModel, LinearModelT, LinearFactorModel, DynamicLinearFactorModel,
        NormalFactorModelDGP, DynamicFactorModelDGP,
        dgp_generate
 
@@ -20,6 +20,7 @@ include("sampling/sampling_factor_loading.jl")
 include("sampling/sampling_df.jl")
 include("sampling/sampling_mixture_scale.jl")
 include("sampling/sampling_carter_kohn.jl")
+include("sampling/sampling_factor_dynamic.jl")
 
 # Add filters:
 include("filtering/kalman_filter.jl")

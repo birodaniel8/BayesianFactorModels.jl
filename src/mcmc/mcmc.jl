@@ -189,3 +189,48 @@ function mcmc_sampling(model::DynamicLinearFactorModel, y::Array;
     display ? println("Done") : -1
     return [sampled_β, sampled_σ², sampled_θ, sampled_factor]
 end
+
+
+function mcmc_sampling(model::StochasticVolatilityModel, y::Array;
+                       ndraw::Int=1500, 
+                       burnin::Int=500, 
+                       init_vals::Dict=Dict(), 
+                       display::Bool=true,
+                       display_step::Int=250
+                       )
+    
+    T = size(y, 1)
+
+    # Create containers:
+    sampled_ρ = zeros(2, ndraw - burnin)
+    sampled_τ² = zeros(ndraw - burnin)
+    sampled_h = zeros(T, ndraw - burnin)
+
+    # Initial values:
+    τ² = haskey(init_vals, "τ²") ? init_vals["τ²"] : (model.τ_γ_prior - 1) / model.τ_δ_prior
+    h = haskey(init_vals, "h") ? init_vals["h"] : log.(y.^2)
+    h = isa(h, Number) ? ones(T) * h : h
+    h0 = haskey(init_vals, "h0") ? init_vals["h0"] : 0
+    P0 = haskey(init_vals, "P0") ? init_vals["P0"] : 10
+    
+    # Sampling:
+    display ? println("Estimate 1st order stochastic volatility model (via Gibbs sampling)") : -1
+    for i = 1:ndraw
+        (mod(i, display_step) == 0 && display) ? println(i) : -1
+        
+        # Sampling:
+        ρ = sampling_β(h[2:T], [ones(T-1) h[1:T-1]], model.ρ_prior, model.ρ_var_prior, τ², 
+                       stationarity_check=true, constant_included=true)  # sampling the volatility process parameters
+        τ² = sampling_σ²(h[2:T] .- ρ[1] - ρ[2] .* h[1:T-1], model.τ_γ_prior, model.τ_δ_prior)  # sampling volatility of volatility
+        h = sampling_stochastic_volatility(y, h, ρ, τ²[1], h0, P0)  # sampling stochastic volatilty
+
+        # Save samples:
+        if i > burnin
+            sampled_ρ[:, i-burnin] = ρ
+            sampled_τ²[i-burnin] = τ²[1]
+            sampled_h[:, i-burnin] = h
+        end
+    end
+    display ? println("Done") : -1
+    return [sampled_ρ, sampled_τ², sampled_h]
+end

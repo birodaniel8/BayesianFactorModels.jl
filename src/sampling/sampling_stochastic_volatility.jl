@@ -32,7 +32,8 @@ function sampling_stochastic_volatility(ϵ::Vector,
                                         ρ::Vector, 
                                         τ²::Union{Number, Vector}, 
                                         h0::Number=0, 
-                                        P0::Number=1)
+                                        P0::Number=1
+                                        )::Vector
     
     # Input parameters:
     table4 = [[1 0.00730 -10.12999 5.79596];

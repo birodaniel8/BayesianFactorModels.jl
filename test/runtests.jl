@@ -443,3 +443,55 @@ end
                                                                                     "factor" => 0.1))
     @test true
 end
+
+
+@testset "sampling stochastic volatility test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    ϵ = randn(100)
+    h_previous = randn(100) .^ 2
+    ρ = [0.2, 0.8]
+    τ² = [0.01]
+
+    sampled_h = sampling_stochastic_volatility(ϵ, h_previous, ρ, τ²)
+    @test true  # we only check whether the run was successfull
+
+    sampled_h = sampling_stochastic_volatility(ϵ, h_previous, ρ, τ², 0.02, 0.01)
+    @test true
+
+    sampled_h = sampling_stochastic_volatility(ϵ, h_previous, ρ, 0.01, 0.02, 0.01)
+    @test true
+end
+
+
+@testset "StochasticVolatilityModel test" begin
+    # Random sampled input with seed:
+    Random.seed!(0)
+    y =  randn(100)
+
+    model = StochasticVolatilityModel()
+    sampled_ρ, sampled_τ², sampled_h = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true  # we only check whether the run was successfull
+
+    model = StochasticVolatilityModel(0.1, 2, 1.2, 0.03)
+    sampled_ρ, sampled_τ², sampled_h = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = StochasticVolatilityModel([0, 0.3], [2, 3])
+    sampled_ρ, sampled_τ², sampled_h = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = StochasticVolatilityModel(ρ_prior=0.2, ρ_var_prior=[2, 3], τ_γ_prior=1.6, τ_δ_prior=0.02)
+    sampled_ρ, sampled_τ², sampled_h = mcmc_sampling(model, y, ndraw=1000, display=false)
+    @test true
+
+    model = StochasticVolatilityModel(ρ_prior=0.2, ρ_var_prior=[2, 3], τ_γ_prior=1.6, τ_δ_prior=0.02)
+    sampled_ρ, sampled_τ², sampled_h = mcmc_sampling(model, y, ndraw=1000, display=false, 
+                                                     init_vals=Dict("τ²" => 0.1, "h" => 0.1, "h0" => 0.1, "P0" => 11))
+    @test true                                                     
+
+    model = StochasticVolatilityModel(ρ_prior=0.2, ρ_var_prior=[2, 3], τ_γ_prior=1.6, τ_δ_prior=0.02)
+    sampled_ρ, sampled_τ², sampled_h = mcmc_sampling(model, y, ndraw=1000, display=false, 
+                                                     init_vals=Dict("h" => log.(y.^2).+0.01))
+    @test true
+end

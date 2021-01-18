@@ -93,7 +93,7 @@ struct StochasticVolatilityModel
     function StochasticVolatilityModel(_ρ_prior::Union{Number, Vector}=0,
                                        _ρ_var_prior::Union{Number, AbstractArray}=3,
                                        _τ_γ_prior::Number=1.5,
-                                       _τ_δ_prior::Number=0.05,
+                                       _τ_δ_prior::Number=0.05;
                                        ρ_prior::Union{Number, Vector}=_ρ_prior, 
                                        ρ_var_prior::Union{Number, AbstractArray}=_ρ_var_prior, 
                                        τ_γ_prior::Number=_τ_γ_prior, τ_δ_prior::Number=_τ_δ_prior)

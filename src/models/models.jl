@@ -100,3 +100,46 @@ struct StochasticVolatilityModel
         new(ρ_prior, ρ_var_prior, τ_γ_prior, τ_δ_prior)
     end
 end
+
+
+struct DynamicLinearFactorSVModel
+    k::Int
+    β_prior::Union{Number, Array}
+    V_prior::Union{Number, AbstractArray}
+    ρ_prior::Number
+    ρ_var_prior::Number
+    τ_γ_prior::Number
+    τ_δ_prior::Number
+    θ_prior::Number
+    θ_var_prior::Number
+    ρ_factor_prior::Number
+    ρ_factor_var_prior::Number
+    τ_factor_γ_prior::Number
+    τ_factor_δ_prior::Number
+
+    function DynamicLinearFactorSVModel(_k::Int=1,
+                                        _β_prior::Union{Number, Array}=0, 
+                                        _V_prior::Union{Number, AbstractArray}=1, 
+                                        _ρ_prior::Number=0, 
+                                        _ρ_var_prior::Number=3,
+                                        _τ_γ_prior::Number=1.5, 
+                                        _τ_δ_prior::Number=0.5,
+                                        _θ_prior::Number=0,
+                                        _θ_var_prior::Number=1,
+                                        _ρ_factor_prior::Number=0, 
+                                        _ρ_factor_var_prior::Number=3,
+                                        _τ_factor_γ_prior::Number=1.5, 
+                                        _τ_factor_δ_prior::Number=0.5;
+                                        k=_k::Int, β_prior::Union{Number, Array}=_β_prior, 
+                                        V_prior::Union{Number, AbstractArray}=_V_prior, ρ_prior::Number=_ρ_prior, 
+                                        ρ_var_prior::Number=_ρ_var_prior, 
+                                        τ_γ_prior::Number=_τ_γ_prior, τ_δ_prior::Number=_τ_δ_prior,
+                                        θ_prior::Number=_θ_prior, θ_var_prior::Number=_θ_var_prior,
+                                        ρ_factor_prior::Number=_ρ_factor_prior,  
+                                        ρ_factor_var_prior::Number=_ρ_factor_var_prior, 
+                                        τ_factor_γ_prior::Number=_τ_factor_γ_prior,
+                                        τ_factor_δ_prior::Number=_τ_factor_δ_prior)
+        new(k, β_prior, V_prior, ρ_prior, ρ_var_prior, τ_γ_prior, τ_δ_prior, θ_prior, θ_var_prior, ρ_factor_prior,
+            ρ_factor_var_prior, τ_factor_γ_prior, τ_factor_δ_prior)
+    end
+end

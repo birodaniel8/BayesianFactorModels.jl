@@ -234,3 +234,106 @@ function mcmc_sampling(model::StochasticVolatilityModel, y::Array;
     display ? println("Done") : -1
     return [sampled_ρ, sampled_τ², sampled_h]
 end
+
+
+function mcmc_sampling(model::DynamicLinearFactorSVModel, y::Array;
+                       ndraw::Int=1500, 
+                       burnin::Int=500, 
+                       init_vals::Dict=Dict(), 
+                       display::Bool=true,
+                       display_step::Int=250
+                       )
+    
+    T = size(y, 1)
+    m = size(y, 2)
+
+    # Create containers:
+    sampled_β = zeros(m, model.k, ndraw - burnin)
+    sampled_ρ = zeros(2, m, ndraw - burnin)
+    sampled_τ² = zeros(m, ndraw - burnin)
+    sampled_h = zeros(T, m, ndraw - burnin)
+    sampled_θ = zeros(model.k, ndraw - burnin)
+    sampled_factor = zeros(T, model.k, ndraw - burnin)
+    sampled_ρ_factor = zeros(2, model.k, ndraw - burnin)
+    sampled_τ²_factor = zeros(model.k, ndraw - burnin)
+    sampled_g = zeros(T, model.k, ndraw - burnin)
+
+    # Initial values:
+    τ² = haskey(init_vals, "τ²") ? init_vals["τ²"] : ones(m) * (model.τ_γ_prior - 1) / model.τ_δ_prior
+    τ² = isa(τ², Number) ? ones(m) * τ² : τ²
+    τ²_factor = haskey(init_vals, "τ²_factor") ? init_vals["τ²_factor"] : ones(model.k) * (model.τ_factor_γ_prior - 1) / model.τ_factor_δ_prior
+    τ²_factor = isa(τ²_factor, Number) ? ones(model.k) * τ²_factor : τ²_factor
+    factor = haskey(init_vals, "factor") ? init_vals["factor"] : factor_initialize(y, model.k)
+    factor = isa(factor, Number) ? ones(T, model.k) * factor : factor
+    h = haskey(init_vals, "h") ? init_vals["h"] : zeros(T, m)
+    h = isa(h, Number) ? ones(T, m) * h : h
+    g = haskey(init_vals, "g") ? init_vals["g"] : zeros(T, model.k)
+    g = isa(g, Number) ? ones(T, model.k) * g : g
+
+    θ = zeros(model.k)
+    ρ = zeros(2, m)
+    ρ_factor = zeros(2, model.k)
+    error_variance = zeros(m, m, T)
+    error_variance[repeat(Matrix(I(m))[:], T)] = exp.(h)'[:]
+    factor_error_variance = zeros(model.k, model.k, T)
+    factor_error_variance[repeat(Matrix(I(model.k))[:], T)] = exp.(g)'[:]
+    
+    # Sampling:
+    display ? println("Estimate dynamic linear factor stochastic volatility model (via Gibbs sampling)") : -1
+    for i = 1:ndraw
+        (mod(i, display_step) == 0 && display) ? println(i) : -1
+
+        # Sampling factor loadings:
+        β = sampling_factor_loading(y, factor, model.β_prior, model.V_prior, error_variance)
+
+        # Sampling stochastic volatility components:
+        ϵ = y - factor * β'
+        for i = 1:m
+            ρ[:, i] = sampling_β(h[2:T, i], [ones(T-1) h[1:T-1, i]], model.ρ_prior, model.ρ_var_prior, τ²[i],
+                                 stationarity_check=true, constant_included=true)
+            τ²[i] = sampling_σ²(h[2:T, i] .- ρ[1, i] - ρ[2, i] .* h[1:T-1, i], model.τ_γ_prior, model.τ_δ_prior)[1]
+            h[:, i] = sampling_stochastic_volatility(ϵ[:, i], h[:, i], ρ[:, i], τ²[i])
+        end
+
+        # Sampling factor AR(1) coefficients:
+        for j = 1:model.k
+            factor_star = 1 ./ (exp.(g[2:T, j]/2)) .* factor[2:T, j]
+            factor_lag_star = 1 ./(exp.(g[2:T, j]/2)) .* factor[1:T-1, j]
+            θ[j] = sampling_β(factor_star, factor_lag_star, model.θ_prior, model.θ_var_prior, 1, 
+                              stationarity_check=true)[1]   # sigma2 = 1?
+        end 
+
+        # Sampling factors:
+        error_variance[repeat(Matrix(I(m))[:], T)] = exp.(h)'[:]
+        factor_error_variance[repeat(Matrix(I(model.k))[:], T)] = exp.(g)'[:]
+        factor = sampling_factor_dynamic(y, β, θ, error_variance, factor_error_variance)
+
+        # Sampling factor stochastic volatility components:
+        ϵ_factor = factor[2:T, :] - factor[1:T-1, :]
+        for j = 1:model.k
+            ρ_factor[:, j] = sampling_β(g[3:T, j], [ones(T-2) g[2:T-1, j]], model.ρ_factor_prior, 
+                                        model.ρ_factor_var_prior, τ²_factor[j], 
+                                        stationarity_check=true, constant_included=true)
+            τ²_factor[j] = sampling_σ²(g[3:T, j] .- ρ_factor[1, j] - ρ_factor[2, j] .* g[2:T-1, j],
+                                       model.τ_factor_γ_prior, model.τ_factor_δ_prior)[1]
+            g[2:T, j] = sampling_stochastic_volatility(ϵ_factor[:, j], g[2:T, j], ρ_factor[:, j], τ²_factor[j])
+            g[1, j] = g[2, j]
+        end
+
+        # Save samples:
+        if i > burnin
+            sampled_β[:, :, i-burnin] = β
+            sampled_ρ[:, :, i - burnin] = ρ
+            sampled_τ²[:, i - burnin] = τ²
+            sampled_h[:, :, i - burnin] = h
+            sampled_θ[:, i-burnin] = θ
+            sampled_factor[:, :, i-burnin] = factor
+            sampled_ρ_factor[:, :, i - burnin] = ρ_factor
+            sampled_τ²_factor[:, i - burnin] = τ²_factor
+            sampled_g[:, :, i - burnin] = g
+        end
+    end
+    display ? println("Done") : -1
+    return [sampled_β, sampled_ρ, sampled_τ², sampled_h, 
+            sampled_θ, sampled_factor, sampled_ρ_factor, sampled_τ²_factor, sampled_g]
+end

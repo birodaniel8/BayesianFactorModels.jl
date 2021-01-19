@@ -9,7 +9,8 @@ export sampling_β, sampling_σ², sampling_factor, sampling_factor_loading, sam
        mcmc_sampling,
        kalman_filter,
        LinearModel, LinearModelT, LinearFactorModel, DynamicLinearFactorModel, StochasticVolatilityModel, 
-       NormalFactorModelDGP, DynamicFactorModelDGP,
+       DynamicLinearFactorSVModel, 
+       NormalFactorModelDGP, DynamicFactorModelDGP, 
        dgp_generate
 
 # Add sampling functions:

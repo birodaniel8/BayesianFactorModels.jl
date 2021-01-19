@@ -21,7 +21,7 @@ and \$N(\\beta_{posterior},V_{posterior})\$ else, where
 - `f::Array`: (T x k) estimated factor values
 - `β_prior::Union{Number, Array}`: (m x k) mean of the prior distribution of factor loadings (\$\\beta_{prior}\$)
 - `V_prior::Union{Number, Array}`: (m x k) variance of the prior distributions (\$V_{prior}\$)
-- `Σ::Union{Vector, AbstractArray}`: (m x m) error covariance matrix (\$\\Sigma\$)
+- `Σ::Union{Vector, AbstractArray}`: (m x m x (T)) error covariance matrix (\$\\Sigma\$)
 
 ## Returns
 - `sampled_β::Array`: (m x k) sampled \$\\beta\$ factor loadings
@@ -48,11 +48,12 @@ function sampling_factor_loading(y::Array,
     # Sampling factor loading row by row (creating a lower triangular matrix with positive diagonal elements):
     sampled_β = zeros(m, k)
     for i = 1:m
+        error_variance = size(Σ, 3) > 1 ? Σ[i, i, :] : Σ[i, i]
         if i <= k
-            sampled_β[i, 1:i] = sampling_β(y[:, i], f[:, 1:i], β_prior[i, 1:i], V_prior[i, 1:i], Σ[i, i], 
+            sampled_β[i, 1:i] = sampling_β(y[:, i], f[:, 1:i], β_prior[i, 1:i], V_prior[i, 1:i], error_variance, 
                                            last_truncated=true)
         else
-            sampled_β[i, :] = sampling_β(y[:, i], f, β_prior[i, :], V_prior[i, :], Σ[i, i])
+            sampled_β[i, :] = sampling_β(y[:, i], f, β_prior[i, :], V_prior[i, :], error_variance)
         end
     end
     return sampled_β

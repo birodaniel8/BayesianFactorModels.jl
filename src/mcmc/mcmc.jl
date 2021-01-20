@@ -318,6 +318,7 @@ function mcmc_sampling(model::DynamicLinearFactorSVModel, y::Array;
                                        model.τ_factor_γ_prior, model.τ_factor_δ_prior)[1]
             g[2:T, j] = sampling_stochastic_volatility(ϵ_factor[:, j], g[2:T, j], ρ_factor[:, j], τ²_factor[j])
             g[1, j] = g[2, j]
+            g = g.-mean(g, dims=1)  # demeaning
         end
 
         # Save samples:

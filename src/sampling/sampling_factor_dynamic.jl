@@ -36,7 +36,7 @@ function sampling_factor_dynamic(y::Array,
 
     # Transform prior inputs to the right format:
     θ = isa(θ, Number) ? ones(k) * θ : θ  # Number to vector
-    Σ = isa(Σ, Number) ? I(k) * Σ : Σ  # Number to diag array
+    Σ = isa(Σ, Number) ? I(m) * Σ : Σ  # Number to diag array
     Σ = isa(Σ, Vector) ? Diagonal(Σ) : Σ  # Vector to diag array
     Σ_factor = isa(Σ_factor, Number) ? I(k) * Σ_factor : Σ_factor  # Number to diag array
     Σ_factor = isa(Σ_factor, Vector) ? Diagonal(Σ_factor) : Σ_factor  # Vector to diag array
